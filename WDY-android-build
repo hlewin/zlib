@@ -1,39 +1,17 @@
 #!/bin/bash
 
-
-# libz has no really working build-system and hence needs super-special care.
-# substituting SONAMEs is really tricky in remove_soname_versions
-#
 # ALWAYS when updating or messing with this make sure that
 # 1. Filename and SONAME match in the library under PLATFORM/lib
 # 2. The zlib.pc refers to the right file
 
 set -e
 
-if [ -z ${WDY_XBUILD_ROOT} ]; then
-	echo "WDY_XBUILD_ROOT not set!"
-	exit 1
-fi
 
-PLATFORMS="armeabi-v7a arm64-v8a x86 x86_64 linux"
 
 DIR=$(readlink -f $(dirname $0))
 
 
-BUILD=$(mktemp -d)
-
-cd ${BUILD}
-
-for P in ${PLATFORMS}; do
-	rm -rf ${BUILD}/*
-	. ${WDY_XBUILD_ROOT}/bin/android-env-clear
-	. ${WDY_XBUILD_ROOT}/bin/android-env ${P}
-	${DIR}/configure --prefix=${WDY_XBUILD_ROOT}/${P}
-	make -j8 && make install
-done
-
-
-
+${WDY_XBUILD_ROOT}/bin/cmake-android-build ${DIR} 
 	
 ${WDY_XBUILD_ROOT}/bin/prepare_libraries.sh
 
